@@ -1,6 +1,7 @@
 **Jednoduchý CUDA program pro řešení 2D Poissonovy rovnice pomocí Jacobiho iterační metody na GPU**
 
 **Inicializace pole**
+
 __global__ void init(real* old_u, real* new_u, real* f, int N, real h) {
     int i = blockIdx.y * blockDim.y + threadIdx.y;
     int j = blockIdx.x * blockDim.x + threadIdx.x;
