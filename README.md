@@ -115,6 +115,7 @@ Výsledky se následně vypíšou do konzole.
 <p align="center">
 <img width="399" height="104" alt="image" src="https://github.com/user-attachments/assets/f04896a5-9393-4135-84d1-6e0f08816cdd" />
 </p>
+
 6.  Uvolnění paměti
 ```cpp
     cudaFree(old_u);
