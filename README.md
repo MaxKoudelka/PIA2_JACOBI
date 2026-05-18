@@ -19,3 +19,4 @@ __global__ void init(real* old_u, real* new_u, real* f, int N, real h) {
     }
 }
 ```
+Inicializační CUDA jádro init slouží k přípravě dat před samotným výpočtem Jacobiho iterací. Každé GPU vlákno zpracovává jeden bod dvourozměrné mřížky, přičemž z indexů vláken a bloků vypočítá odpovídající souřadnice (i, j). Pro každý bod jsou pole old_u a new_u nastavena na nulovou počáteční aproximaci řešení. Následně se z diskrétních indexů vypočítají fyzikální souřadnice x a y v oblasti [0,1] × [0,1] a do pole f se uloží hodnota pravé strany Poissonovy rovnice definovaná funkcí f(x,y)=2π^2sin(πx)sin(πy). Jádro běží paralelně na GPU, takže všechny body mřížky jsou inicializovány současně, což výrazně urychluje přípravu dat pro následný numerický výpočet.
