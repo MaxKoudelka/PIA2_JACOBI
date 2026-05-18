@@ -72,6 +72,8 @@ Jádro jacobi provádí jednu iteraci Jacobiho metody pro řešení Poissonovy r
     init<<<grid, block>>>(old_u, new_u, f, N, h);
     cudaDeviceSynchronize();
 ```
+Tato část alokuje paměť na GPU pomocí funkcí cudaMalloc pro pole old_u, new_u a f. Poté se nastaví konfigurace CUDA kernelů pomocí objektů dim3, kde block(16,16) určuje počet vláken v jednom bloku a grid(...) počet bloků potřebných pro pokrytí celé mřížky.
+
 3.  Výpočet
 ```cpp
     auto start = chrono::high_resolution_clock::now();
