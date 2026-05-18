@@ -20,7 +20,7 @@ __global__ void init(real* old_u, real* new_u, real* f, int N, real h) {
 }
 ```
 Inicializační CUDA jádro `init` slouží k přípravě dat před samotným výpočtem Jacobiho iterací. Každé GPU vlákno zpracovává jeden bod dvourozměrné sítě, přičemž z indexů vláken a bloků vypočítá odpovídající souřadnice    `(i, j)`. Pro každý bod jsou pole `old_u` a `new_u` nastavena na nulovou počáteční aproximaci řešení. Následně se z diskrétních indexů vypočítají fyzikální souřadnice `x` a `y` v oblasti `[0,1] × [0,1]` a do pole `f` se uloží hodnota pravé strany Poissonovy rovnice definovaná funkcí $f(x,y)=2\pi^2\sin(\pi x)\sin(\pi y)$. 
-Jádro běží paralelně na GPU, takže všechny body mřížky jsou inicializovány současně, což výrazně urychluje přípravu dat pro následný numerický výpočet.
+Jádro běží paralelně na GPU, takže všechny body sítě jsou inicializovány současně, což výrazně urychluje přípravu dat pro následný numerický výpočet.
 
 **2)  Jacobiho metoda**
 ```cpp
@@ -41,7 +41,7 @@ __global__ void jacobi(real* old_u, real* new_u, real* f, int N, real h2_4) {
     }
 }
 ```
-Jádro `jacobi` provádí jednu iteraci Jacobiho metody pro řešení Poissonovy rovnice na 2D mřížce. Každé vlákno na GPU počítá jeden vnitřní bod mřížky podle hodnot jeho čtyř sousedů z předchozí iterace. Indexy `i` a `j` jsou posunuté o `+1`, aby se nepočítaly okrajové body, protože na hranicích jsou nastavené nulové okrajové podmínky. Nejprve se vypočítá lineární index `idx` pro přístup do jednorozměrného pole v paměti GPU a potom se spočítá nová hodnota podle diskrétního tvaru Poissonovy rovnice:
+Jádro `jacobi` provádí jednu iteraci Jacobiho metody pro řešení Poissonovy rovnice na 2D mřížce. Každé vlákno na GPU počítá jeden vnitřní bod sítě podle hodnot jeho čtyř sousedů z předchozí iterace. Indexy `i` a `j` jsou posunuté o `+1`, aby se nepočítaly okrajové body, protože na hranicích jsou nastavené nulové okrajové podmínky. Nejprve se vypočítá lineární index `idx` pro přístup do jednorozměrného pole v paměti GPU a potom se spočítá nová hodnota podle diskrétního tvaru Poissonovy rovnice:
 <p align="center">
 <img width="638" height="85" alt="image" src="https://github.com/user-attachments/assets/fe32cae6-ec50-4479-866f-afd8bfafc5d1" />
 </p>
@@ -60,7 +60,7 @@ Jádro `jacobi` provádí jednu iteraci Jacobiho metody pro řešení Poissonovy
 
     real *old_u, *new_u, *f;
 ```
-Nejprve se nastaví parametry simulace, jako velikost mřížky `N` a počet Jacobiho iterací `max_iterations`. Dále se vypočítá krok mřížky `h`.
+Nejprve se nastaví parametry simulace, jako velikost sítě `N` a počet Jacobiho iterací `max_iterations`. Dále se vypočítá krok sítě `h`.
 
 2.  Nastavení CUDA
 ```cpp
@@ -75,7 +75,7 @@ Nejprve se nastaví parametry simulace, jako velikost mřížky `N` a počet Jac
     init<<<grid, block>>>(old_u, new_u, f, N, h);
     cudaDeviceSynchronize();
 ```
-Tato část alokuje paměť na GPU pomocí funkcí `cudaMalloc` pro pole `old_u`, `new_u` a `f`. Poté se nastaví konfigurace CUDA kernelů pomocí objektů `dim3`, kde `block(16,16)` určuje počet vláken v jednom bloku a `grid(...)` počet bloků potřebných pro pokrytí celé mřížky.
+Tato část alokuje paměť na GPU pomocí funkcí `cudaMalloc` pro pole `old_u`, `new_u` a `f`. Poté se nastaví konfigurace CUDA kernelů pomocí objektů `dim3`, kde `block(16,16)` určuje počet vláken v jednom bloku a `grid(...)` počet bloků potřebných pro pokrytí celé sítě.
 
 3.  Výpočet
 ```cpp
