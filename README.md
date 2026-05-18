@@ -19,7 +19,8 @@ __global__ void init(real* old_u, real* new_u, real* f, int N, real h) {
     }
 }
 ```
-Inicializační CUDA jádro `init` slouží k přípravě dat před samotným výpočtem Jacobiho iterací. Každé GPU vlákno zpracovává jeden bod dvourozměrné mřížky, přičemž z indexů vláken a bloků vypočítá odpovídající souřadnice   `(i, j)`. Pro každý bod jsou pole `old_u` a `new_u` nastavena na nulovou počáteční aproximaci řešení. Následně se z diskrétních indexů vypočítají fyzikální souřadnice `x` a `y` v oblasti `[0,1] × [0,1]` a do pole `f` se uloží hodnota pravé strany Poissonovy rovnice definovaná funkcí $f(x,y)=2\pi^2\sin(\pi x)\sin(\pi y)$. Jádro běží paralelně na GPU, takže všechny body mřížky jsou inicializovány současně, což výrazně urychluje přípravu dat pro následný numerický výpočet.
+Inicializační CUDA jádro `init` slouží k přípravě dat před samotným výpočtem Jacobiho iterací. Každé GPU vlákno zpracovává jeden bod dvourozměrné sítě, přičemž z indexů vláken a bloků vypočítá odpovídající souřadnice    `(i, j)`. Pro každý bod jsou pole `old_u` a `new_u` nastavena na nulovou počáteční aproximaci řešení. Následně se z diskrétních indexů vypočítají fyzikální souřadnice `x` a `y` v oblasti `[0,1] × [0,1]` a do pole `f` se uloží hodnota pravé strany Poissonovy rovnice definovaná funkcí $f(x,y)=2\pi^2\sin(\pi x)\sin(\pi y)$. 
+Jádro běží paralelně na GPU, takže všechny body mřížky jsou inicializovány současně, což výrazně urychluje přípravu dat pro následný numerický výpočet.
 
 **Jacobiho metoda**
 ```cpp
@@ -111,7 +112,9 @@ Po skončení iterací program vypočítá výkon GPU v jednotkách GFLOPS a odh
     cout << "Memory Bandwidth: " << bandwidth << " GB/s" << endl;
 ```
 Výsledky se následně vypíšou do konzole.
-
+<p align="center">
+<img width="399" height="104" alt="image" src="https://github.com/user-attachments/assets/f04896a5-9393-4135-84d1-6e0f08816cdd" />
+</p>
 6.  Uvolnění paměti
 ```cpp
     cudaFree(old_u);
