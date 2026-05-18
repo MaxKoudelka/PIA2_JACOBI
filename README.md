@@ -122,4 +122,4 @@ Výsledky se následně vypíšou do konzole.
     cudaFree(new_u);
     cudaFree(f);
 ```
-Nakonec se uvolní alokovaná GPU paměť pomocí cudaFree a program se ukončí.
+Nakonec se uvolní alokovaná GPU paměť pomocí `cudaFree` a program se ukončí.
