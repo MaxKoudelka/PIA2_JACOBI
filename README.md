@@ -25,4 +25,4 @@ Jádro jacobi provádí jednu iteraci Jacobiho metody pro řešení Poissonovy r
 <p align="center">
 <img width="638" height="85" alt="image" src="https://github.com/user-attachments/assets/fe32cae6-ec50-4479-866f-afd8bfafc5d1" />
 </p>
-V programu je výraz $(h^2)/4$ uložený v proměnné h2_4, aby se během výpočtu nemuselo znovu počítat dělení. Hodnoty z předchozí iterace jsou uložené v poli old_u a nové vypočítané hodnoty se zapisují do new_u. Výpočet probíhá paralelně na GPU, takže se všechny body mřížky počítají současně.
+V programu je výraz $\frac{h^2}{4}$ uložený v proměnné h2_4, aby se během výpočtu nemuselo znovu počítat dělení. Hodnoty z předchozí iterace jsou uložené v poli old_u a nové vypočítané hodnoty se zapisují do new_u. Výpočet probíhá paralelně na GPU, takže se všechny body mřížky počítají současně.
