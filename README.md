@@ -45,4 +45,75 @@ Jádro jacobi provádí jednu iteraci Jacobiho metody pro řešení Poissonovy r
 <img width="638" height="85" alt="image" src="https://github.com/user-attachments/assets/fe32cae6-ec50-4479-866f-afd8bfafc5d1" />
 </p>
 
+** main funkce **
+1.  Nastavení parametrů simulace
+```cpp
+    int N = 8192;
+    int max_iterations = 100;
 
+    real L = 1.0f;
+    real h = L / (N - 1);
+    real h2_4 = (h * h) / 4.0f;
+
+    size_t size = N * N * sizeof(real);
+
+    real *old_u, *new_u, *f;
+```
+2.  Nastavení CUDA
+```cpp
+    cudaMalloc(&old_u, size);
+    cudaMalloc(&new_u, size);
+    cudaMalloc(&f, size);
+
+    dim3 block(16, 16);
+    dim3 grid((N + block.x - 1) / block.x,
+              (N + block.y - 1) / block.y);
+
+    init<<<grid, block>>>(old_u, new_u, f, N, h);
+    cudaDeviceSynchronize();
+```
+3.  Výpočet
+```cpp
+    auto start = chrono::high_resolution_clock::now();
+
+    for (int iter = 0; iter < max_iterations; iter++) {
+        jacobi<<<grid, block>>>(old_u, new_u, f, N, h2_4);
+        cudaDeviceSynchronize();
+
+        real* temp = old_u;
+        old_u = new_u;
+        new_u = temp;
+    }
+
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+```
+4.  Výkon a Paměťová propustnost
+```cpp
+    auto start = chrono::high_resolution_clock::now();
+
+    for (int iter = 0; iter < max_iterations; iter++) {
+        jacobi<<<grid, block>>>(old_u, new_u, f, N, h2_4);
+        cudaDeviceSynchronize();
+
+        real* temp = old_u;
+        old_u = new_u;
+        new_u = temp;
+    }
+
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+```
+5.  Výpis
+```cpp
+    cout << "Iterations: " << max_iterations << endl;
+    cout << "Elapsed time: " << elapsed.count() << " s" << endl;
+    cout << "Performance: " << gflops << " GFLOPS" << endl;
+    cout << "Memory Bandwidth: " << bandwidth << " GB/s" << endl;
+```
+6.  Uvolnění paměti
+```cpp
+    cudaFree(old_u);
+    cudaFree(new_u);
+    cudaFree(f);
+```
