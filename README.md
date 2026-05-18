@@ -1,4 +1,4 @@
-**Jednoduchý CUDA program pro řešení 2D Poissonovy rovnice pomocí Jacobiho iterační metody na GPU**
+**CUDA program pro řešení 2D Poissonovy rovnice pomocí Jacobiho iterační metody na GPU**
 
 **Inicializace pole**
 ```cpp
