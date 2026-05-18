@@ -45,7 +45,7 @@ Jádro jacobi provádí jednu iteraci Jacobiho metody pro řešení Poissonovy r
 <img width="638" height="85" alt="image" src="https://github.com/user-attachments/assets/fe32cae6-ec50-4479-866f-afd8bfafc5d1" />
 </p>
 
-** main funkce **
+**main funkce**
 1.  Nastavení parametrů simulace
 ```cpp
     int N = 8192;
