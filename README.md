@@ -1,6 +1,6 @@
 **CUDA program pro řešení 2D Poissonovy rovnice pomocí Jacobiho iterační metody na GPU**
 
-**Inicializace pole**
+**1)  Inicializace pole**
 ```cpp
 __global__ void init(real* old_u, real* new_u, real* f, int N, real h) {
     int i = blockIdx.y * blockDim.y + threadIdx.y;
@@ -22,7 +22,7 @@ __global__ void init(real* old_u, real* new_u, real* f, int N, real h) {
 Inicializační CUDA jádro `init` slouží k přípravě dat před samotným výpočtem Jacobiho iterací. Každé GPU vlákno zpracovává jeden bod dvourozměrné sítě, přičemž z indexů vláken a bloků vypočítá odpovídající souřadnice    `(i, j)`. Pro každý bod jsou pole `old_u` a `new_u` nastavena na nulovou počáteční aproximaci řešení. Následně se z diskrétních indexů vypočítají fyzikální souřadnice `x` a `y` v oblasti `[0,1] × [0,1]` a do pole `f` se uloží hodnota pravé strany Poissonovy rovnice definovaná funkcí $f(x,y)=2\pi^2\sin(\pi x)\sin(\pi y)$. 
 Jádro běží paralelně na GPU, takže všechny body mřížky jsou inicializovány současně, což výrazně urychluje přípravu dat pro následný numerický výpočet.
 
-**Jacobiho metoda**
+**2)  Jacobiho metoda**
 ```cpp
 __global__ void jacobi(real* old_u, real* new_u, real* f, int N, real h2_4) {
     int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
@@ -46,7 +46,7 @@ Jádro `jacobi` provádí jednu iteraci Jacobiho metody pro řešení Poissonovy
 <img width="638" height="85" alt="image" src="https://github.com/user-attachments/assets/fe32cae6-ec50-4479-866f-afd8bfafc5d1" />
 </p>
 
-**main funkce**
+**3)  funkce main()**
 1.  Nastavení parametrů simulace
 ```cpp
     int N = 8192;
