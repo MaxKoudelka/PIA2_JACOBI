@@ -59,6 +59,8 @@ Jádro jacobi provádí jednu iteraci Jacobiho metody pro řešení Poissonovy r
 
     real *old_u, *new_u, *f;
 ```
+Nejprve se nastaví parametry simulace, jako velikost mřížky N a počet Jacobiho iterací max_iterations. Dále se vypočítá krok mřížky h.
+
 2.  Nastavení CUDA
 ```cpp
     cudaMalloc(&old_u, size);
@@ -90,22 +92,17 @@ Tato část alokuje paměť na GPU pomocí funkcí cudaMalloc pro pole old_u, ne
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
 ```
+Ve for cyklu se opakovaně spouští kernel jacobi, který provádí jednotlivé Jacobiho iterace. Po každé iteraci dojde k prohození ukazatelů old_u a new_u, takže nově vypočítané hodnoty se použijí jako vstup pro další iteraci. Synchronizace výpočtu se provádí pomocí cudaDeviceSynchronize().
+
 4.  Výkon a Paměťová propustnost
 ```cpp
-    auto start = chrono::high_resolution_clock::now();
-
-    for (int iter = 0; iter < max_iterations; iter++) {
-        jacobi<<<grid, block>>>(old_u, new_u, f, N, h2_4);
-        cudaDeviceSynchronize();
-
-        real* temp = old_u;
-        old_u = new_u;
-        new_u = temp;
-    }
-
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsed = end - start;
+    double total_points = (double)(N - 2) * (N - 2) * max_iterations;
+    double gflops = (total_points * 7.0) / (elapsed.count() * 1e9);
+    double bandwidth = (total_points * 6.0 * sizeof(real)) /
+                       (elapsed.count() * 1024 * 1024 * 1024);
 ```
+Po skončení iterací program vypočítá výkon GPU v jednotkách GFLOPS a odhad paměťové propustnosti v GB/s.
+
 5.  Výpis
 ```cpp
     cout << "Iterations: " << max_iterations << endl;
@@ -113,9 +110,12 @@ Tato část alokuje paměť na GPU pomocí funkcí cudaMalloc pro pole old_u, ne
     cout << "Performance: " << gflops << " GFLOPS" << endl;
     cout << "Memory Bandwidth: " << bandwidth << " GB/s" << endl;
 ```
+Výsledky se následně vypíšou do konzole.
+
 6.  Uvolnění paměti
 ```cpp
     cudaFree(old_u);
     cudaFree(new_u);
     cudaFree(f);
 ```
+Nakonec se uvolní alokovaná GPU paměť pomocí cudaFree a program se ukončí.
